@@ -44,6 +44,7 @@ import {
     IDMappedObjects,
     NameMappedObjects,
     RelationOneToMany,
+    RelationOneToManyUnique,
     RelationOneToOne,
     UserIDMappedObjects,
 } from 'types/utilities';
@@ -1111,9 +1112,9 @@ export const getSortedDirectChannelIds: (state: GlobalState, lastUnreadChannel: 
     },
 );
 
-const getProfiles = (currentUserId: string, usersIdsInChannel: string[], users: IDMappedObjects<UserProfile>): UserProfile[] => {
+const getProfiles = (currentUserId: string, usersIdsInChannel: Set<string> | undefined, users: IDMappedObjects<UserProfile>): UserProfile[] => {
     const profiles: UserProfile[] = [];
-    usersIdsInChannel.forEach((userId) => {
+    usersIdsInChannel?.forEach((userId) => {
         if (userId !== currentUserId) {
             profiles.push(users[userId]);
         }
@@ -1128,11 +1129,11 @@ export const getChannelsWithUserProfiles: (state: GlobalState) => Array<{
     getUsers,
     getGroupChannels,
     getCurrentUserId,
-    (channelUserMap: RelationOneToMany<Channel, UserProfile>, users: IDMappedObjects<UserProfile>, channels: Channel[], currentUserId: string) => {
+    (channelUserMap: RelationOneToManyUnique<Channel, UserProfile>, users: IDMappedObjects<UserProfile>, channels: Channel[], currentUserId: string) => {
         return channels.map((channel: Channel): {
             profiles: UserProfile[];
         } & Channel => {
-            const profiles = getProfiles(currentUserId, channelUserMap[channel.id] || [], users);
+            const profiles = getProfiles(currentUserId, channelUserMap[channel.id], users);
             return {
                 ...channel,
                 profiles,

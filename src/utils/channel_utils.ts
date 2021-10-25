@@ -1,19 +1,17 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {General, Preferences, Permissions, Users} from '../constants';
 import {MarkUnread} from 'constants/channels';
-
 import {hasNewPermissions} from 'selectors/entities/general';
-import {haveITeamPermission, haveIChannelPermission} from 'selectors/entities/roles';
-import {Channel, ChannelMembership, ChannelType, ChannelNotifyProps} from 'types/channels';
+import {haveIChannelPermission, haveITeamPermission} from 'selectors/entities/roles';
+import {Channel, ChannelMembership, ChannelNotifyProps, ChannelType} from 'types/channels';
 import {Post} from 'types/posts';
-import {UsersState, UserProfile, UserNotifyProps} from 'types/users';
+import {PreferenceType} from 'types/preferences';
 import {GlobalState} from 'types/store';
 import {TeamMembership} from 'types/teams';
-import {PreferenceType} from 'types/preferences';
-import {IDMappedObjects, RelationOneToMany, RelationOneToOne} from 'types/utilities';
-
+import {UserNotifyProps, UserProfile, UsersState} from 'types/users';
+import {IDMappedObjects, RelationOneToManyUnique, RelationOneToOne} from 'types/utilities';
+import {General, Permissions, Preferences, Users} from '../constants';
 import {getPreferenceKey} from './preference_utils';
 import {displayUsername} from './user_utils';
 
@@ -48,7 +46,7 @@ export function completeDirectChannelInfo(usersState: UsersState, teammateNameDi
 //
 // Ideally, this would replace completeDirectChannelInfo altogether, but is currently factored out
 // to minimize changes while addressing a critical performance issue.
-export function newCompleteDirectChannelInfo(currentUserId: string, profiles: IDMappedObjects<UserProfile>, profilesInChannel: RelationOneToMany<Channel, UserProfile>, teammateStatus: string, teammateNameDisplay: string, channel: Channel): Channel {
+export function newCompleteDirectChannelInfo(currentUserId: string, profiles: IDMappedObjects<UserProfile>, profilesInChannel: RelationOneToManyUnique<Channel, UserProfile>, teammateStatus: string, teammateNameDisplay: string, channel: Channel): Channel {
     if (isDirectChannel(channel)) {
         const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
 
@@ -73,7 +71,7 @@ export function completeDirectChannelDisplayName(currentUserId: string, profiles
 
         return Object.assign(dmChannelClone, {display_name: displayUsername(profiles[teammateId], teammateNameDisplay)});
     } else if (isGroupChannel(channel) && userIdsInChannel && userIdsInChannel.size > 0) {
-        const displayName = getGroupDisplayNameFromUserIds(Array.from(userIdsInChannel), profiles, currentUserId, teammateNameDisplay);
+        const displayName = getGroupDisplayNameFromUserIds(userIdsInChannel, profiles, currentUserId, teammateNameDisplay);
         return {...channel, display_name: displayName};
     }
 
@@ -429,7 +427,7 @@ export function getChannelsIdForTeam(state: GlobalState, teamId: string): string
     }, [] as string[]);
 }
 
-export function getGroupDisplayNameFromUserIds(userIds: string[], profiles: IDMappedObjects<UserProfile>, currentUserId: string, teammateNameDisplay: string): string {
+export function getGroupDisplayNameFromUserIds(userIds: Set<string>, profiles: IDMappedObjects<UserProfile>, currentUserId: string, teammateNameDisplay: string): string {
     const names: string[] = [];
     userIds.forEach((id) => {
         if (id !== currentUserId) {
@@ -468,14 +466,14 @@ function completeDirectGroupInfo(usersState: UsersState, teammateNameDisplay: st
 
     const usernames = gm.display_name.split(', ');
     const users = Object.keys(profiles).map((key) => profiles[key]);
-    const userIds: string[] = [];
+    const userIds: Set<string> = new Set();
     usernames.forEach((username: string) => {
         const u = users.find((p): boolean => p.username === username);
         if (u) {
-            userIds.push(u.id);
+            userIds.add(u.id);
         }
     });
-    if (usernames.length === userIds.length) {
+    if (usernames.length === userIds.size) {
         gm.display_name = getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId, teammateNameDisplay);
         return gm;
     }
@@ -488,7 +486,7 @@ function completeDirectGroupInfo(usersState: UsersState, teammateNameDisplay: st
 // calling selector to have fewer dependencies, reducing its need to recompute when memoized.
 //
 // See also newCompleteDirectChannelInfo.
-function newCompleteDirectGroupInfo(currentUserId: string, profiles: IDMappedObjects<UserProfile>, profilesInChannel: RelationOneToMany<Channel, UserProfile>, teammateNameDisplay: string, channel: Channel) {
+function newCompleteDirectGroupInfo(currentUserId: string, profiles: IDMappedObjects<UserProfile>, profilesInChannel: RelationOneToManyUnique<Channel, UserProfile>, teammateNameDisplay: string, channel: Channel) {
     const profilesIds = profilesInChannel[channel.id];
     const gm = {...channel};
 
@@ -499,14 +497,14 @@ function newCompleteDirectGroupInfo(currentUserId: string, profiles: IDMappedObj
 
     const usernames = gm.display_name.split(', ');
     const users = Object.keys(profiles).map((key) => profiles[key]);
-    const userIds: string[] = [];
+    const userIds: Set<string> = new Set();
     usernames.forEach((username: string) => {
         const u = users.find((p): boolean => p.username === username);
         if (u) {
-            userIds.push(u.id);
+            userIds.add(u.id);
         }
     });
-    if (usernames.length === userIds.length) {
+    if (usernames.length === userIds.size) {
         gm.display_name = getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId, teammateNameDisplay);
         return gm;
     }

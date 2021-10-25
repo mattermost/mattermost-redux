@@ -40,6 +40,7 @@ import {
     EmailMappedObjects,
     IDMappedObjects,
     RelationOneToMany,
+    RelationOneToManyUnique,
     RelationOneToOne,
     UsernameMappedObjects,
 } from 'types/utilities';
@@ -56,11 +57,11 @@ type Filters = {
     team_roles?: string[];
 };
 
-export function getUserIdsInChannels(state: GlobalState): RelationOneToMany<Channel, UserProfile> {
+export function getUserIdsInChannels(state: GlobalState): RelationOneToManyUnique<Channel, UserProfile> {
     return state.entities.users.profilesInChannel;
 }
 
-export function getUserIdsNotInChannels(state: GlobalState): RelationOneToMany<Channel, UserProfile> {
+export function getUserIdsNotInChannels(state: GlobalState): RelationOneToManyUnique<Channel, UserProfile> {
     return state.entities.users.profilesNotInChannel;
 }
 
@@ -209,7 +210,7 @@ export const getCurrentUserMentionKeys: (state: GlobalState) => UserMentionKey[]
     },
 );
 
-export const getProfileSetInCurrentChannel: (state: GlobalState) => Array<$ID<UserProfile>> = createSelector(
+export const getProfileSetInCurrentChannel: (state: GlobalState) => Set<$ID<UserProfile>> = createSelector(
     getCurrentChannelId,
     getUserIdsInChannels,
     (currentChannel, channelProfiles) => {
@@ -217,7 +218,7 @@ export const getProfileSetInCurrentChannel: (state: GlobalState) => Array<$ID<Us
     },
 );
 
-export const getProfileSetNotInCurrentChannel: (state: GlobalState) => Array<$ID<UserProfile>> = createSelector(
+export const getProfileSetNotInCurrentChannel: (state: GlobalState) => Set<$ID<UserProfile>> = createSelector(
     getCurrentChannelId,
     getUserIdsNotInChannels,
     (currentChannel, channelProfiles) => {
